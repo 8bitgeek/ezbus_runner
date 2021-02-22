@@ -1,5 +1,6 @@
+
 /*****************************************************************************
-* Copyright © 2019-2020 Mike Sharkey <mike@8bitgeek.net>                     *
+* Copyright © 2021 Mike Sharkey <mike@8bitgeek.net>                          *
 *                                                                            *
 * Permission is hereby granted, free of charge, to any person obtaining a    *
 * copy of this software and associated documentation files (the "Software"), *
@@ -19,75 +20,9 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-		.extern reset_handler
-		.extern _systick
-		.extern	_pendsv
-		.extern _fault
-		.extern	_swi
-		.extern _nmi
-		.extern nvic_isr
+#include <ezbus_runner.h>
 
-		.global _vectors
-		.section .vectors, "ax"
-		.code 16
-		.align 4
-		.thumb_func
-
-_vectors:
-		.word __main_stack_end__	/* Reserved */
-		.word reset_handler			/* Reset Vector */
-		.word _nmi					/* Nmi_ISR */
-		.word _fault				/* Hard Fault_ISR */
-		.word _fault				/* Mem Manage Fault_ISR */
-		.word _fault				/* Bus Fault_ISR */
-		.word _fault				/* Usage Fault_ISR */
-		.word _fault
-		.word _fault
-		.word _fault
-		.word _fault
-		.word _swi					/* Software Interrupt */
-		.word _fault
-		.word _fault
-		.word _pendsv				/* 14 PendSV  */
-		.word _systick				/* 15 SysTick */
-		/* ---- */
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		/* 7 */
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		/* 15 */
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		/* 23 */
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		.word nvic_isr
-		/* 31 */
-_vectors_end:
-
-
-		.end
+extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
+{
+    return -1;
+}
