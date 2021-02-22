@@ -68,5 +68,5 @@ ezbus_runner_2: src/main.o src/ezbus_runner_2.o
 	$(CC) $^ $(LFLAGS) -o $@
 
 clean:
-		rm -f $(OBJS) $(TARGET)
+		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9] *.map
 
