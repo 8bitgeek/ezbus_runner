@@ -19,7 +19,16 @@
 #* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 #* DEALINGS IN THE SOFTWARE.                                                  *
 #*****************************************************************************/
-TARGET=ezbus_runner_1
+TARGETS=ezbus_runner_1.elf \
+		ezbus_runner_2.elf
+
+LIBEZBUS_DIR=./libezbus
+LIBEZBUS_INCLUDE=$(LIBEZBUS_DIR)/src
+LIBEZBUS_TARGET=$(LIBEZBUS_DIR)/libezbus.a
+
+LIBEZBUS_UDP_DIR=./libezbus_udp
+LIBEZBUS_UDP_INCLUDE=$(LIBEZBUS_UDP_DIR)/src
+LIBEZBUS_UDP_TARGET=libezbus_udp/libezbus_udp.a
 
 PREFIX=/usr/bin/
 
@@ -34,15 +43,15 @@ SE=$(PREFIX)size
 ARFLAGS = rcs
 CFLAGS += -c
 CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
-LFLAGS += -Wl,-Map=$(TARGET).map
-LFLAGS += ../libezbus_udp/libezbus_udp.a
+LFLAGS += $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET)
 
 INCLUDE =  -I ./
 INCLUDE += -I ./src
-INCLUDE += -I ../libezbus_udp/src
+INCLUDE += -I $(LIBEZBUS_INCLUDE)
+INCLUDE += -I $(LIBEZBUS_UDP_INCLUDE)
 
-C_SRC  += src/ezbus_runner_1.c
-C_SRC  += src/main.c
+C_SRC += src/ezbus_runner_1.c
+C_SRC += src/main.c
 
 # Object files to build.
 OBJS  = $(AS_SRC:.S=.o)
@@ -50,7 +59,7 @@ OBJS += $(C_SRC:.c=.o)
 
 # Default rule to build the whole project.
 .PHONY: all
-all: $(TARGET)
+all: $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET) $(TARGETS)
 
 # Rule to build assembly files.
 %.o: %.S
@@ -60,13 +69,22 @@ all: $(TARGET)
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDE) $< -o $@
 
+# Rules to make libraries
+$(LIBEZBUS_TARGET):
+	(cd $(LIBEZBUS_DIR) && make)
+
+$(LIBEZBUS_UDP_TARGET):
+	(cd $(LIBEZBUS_UDP_DIR) && make)
+
 # Rule to create an ELF file from the compiled object files.
-$(TARGET): $(OBJS)
+ezbus_runner_1.elf: src/main.o src/ezbus_runner_1.o
 	$(CC) $^ $(LFLAGS) -o $@
 
-ezbus_runner_2: src/main.o src/ezbus_runner_2.o 
+ezbus_runner_2.elf: src/main.o src/ezbus_runner_2.o 
 	$(CC) $^ $(LFLAGS) -o $@
 
 clean:
 		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9] *.map
+		(cd $(LIBEZBUS_DIR) && make clean)
+		(cd $(LIBEZBUS_UDP_DIR) && make clean)
 
