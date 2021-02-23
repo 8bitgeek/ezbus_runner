@@ -1,0 +1,6 @@
+[submodule "libezbus"]
+	path = libezbus
+	url = https://github.com/8bitgeek/libezbus.git
+[submodule "libezbus_udp"]
+	path = libezbus_udp
+	url = https://github.com/8bitgeek/libezbus_udp.git
