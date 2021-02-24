@@ -23,11 +23,15 @@ TARGETS=ezbus_runner_1.elf \
 		ezbus_runner_2.elf
 
 LIBEZBUS_DIR=./libezbus
-LIBEZBUS_INCLUDE=$(LIBEZBUS_DIR)/src
+LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src
+LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src/common
+LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src/mac
+LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src/platform
+LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src/socket
 LIBEZBUS_TARGET=$(LIBEZBUS_DIR)/libezbus.a
 
 LIBEZBUS_UDP_DIR=./libezbus_udp
-LIBEZBUS_UDP_INCLUDE=$(LIBEZBUS_UDP_DIR)/src
+LIBEZBUS_UDP_INCLUDE += -I $(LIBEZBUS_UDP_DIR)/src
 LIBEZBUS_UDP_TARGET=libezbus_udp/libezbus_udp.a
 
 PREFIX=/usr/bin/
@@ -47,10 +51,15 @@ LFLAGS += $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET)
 
 INCLUDE =  -I ./
 INCLUDE += -I ./src
-INCLUDE += -I $(LIBEZBUS_INCLUDE)
-INCLUDE += -I $(LIBEZBUS_UDP_INCLUDE)
+INCLUDE += -I ./src/syslog
+INCLUDE += $(LIBEZBUS_INCLUDE)
+INCLUDE += $(LIBEZBUS_UDP_INCLUDE)
 
-C_SRC += src/ezbus_runner_1.c
+C_SRC += src/syslog/syslog_ezbus.c
+C_SRC += src/syslog/syslog_printf.c
+C_SRC += src/syslog/syslog_timestamp.c
+C_SRC += src/syslog/syslog.c
+C_SRC += src/ezbus_setup.c
 C_SRC += src/main.c
 
 # Object files to build.
@@ -77,14 +86,16 @@ $(LIBEZBUS_UDP_TARGET):
 	(cd $(LIBEZBUS_UDP_DIR) && make)
 
 # Rule to create an ELF file from the compiled object files.
-ezbus_runner_1.elf: src/main.o src/ezbus_runner_1.o
+ezbus_runner_1.elf: $(OBJS) src/ezbus_runner_1.o
 	$(CC) $^ $(LFLAGS) -o $@
 
-ezbus_runner_2.elf: src/main.o src/ezbus_runner_2.o 
+ezbus_runner_2.elf: $(OBJS) src/ezbus_runner_2.o 
 	$(CC) $^ $(LFLAGS) -o $@
 
 clean:
-		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9] *.map
+		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9].elf *.map
 		(cd $(LIBEZBUS_DIR) && make clean)
 		(cd $(LIBEZBUS_UDP_DIR) && make clean)
+		rm -f 	src/ezbus_runner_1.o	\
+				src/ezbus_runner_2.o
 

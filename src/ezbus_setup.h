@@ -1,4 +1,3 @@
-
 /*****************************************************************************
 * Copyright © 2021 Mike Sharkey <mike@8bitgeek.net>                          *
 *                                                                            *
@@ -20,30 +19,29 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_runner.h>
-#include <ezbus.h>
-#include <ezbus_flip.h>
+#ifndef _EZBUS_SETUP_H_
+#define _EZBUS_SETUP_H_
+
+#if defined(_CARIBOU_RTOS_)
+    #include <board.h>
+#else
+    #include <stdint.h>
+    #include <stdbool.h>
+    #include <stdio.h>
+#endif
 #include <ezbus_port.h>
-#include <ezbus_setup.h>
-#include <syslog.h>
-#include <syslog_printf.h>
+#include <ezbus_mac_arbiter.h>
+#include <ezbus_udp_cmdline.h>
 
-extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
-{
-    return -1;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern void ezbus_callback_setup( ezbus_udp_cmdline_t* ezbus_udp_cmdline, ezbus_port_t* port );
+
+#ifdef __cplusplus
 }
+#endif
 
+#endif
 
-extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
-{
-    return false;
-}
-
-extern bool ezbus_socket_callback_recv ( ezbus_socket_t socket )
-{
-    return true;
-}
-
-extern void ezbus_socket_callback_closing ( ezbus_socket_t socket )
-{
-}
