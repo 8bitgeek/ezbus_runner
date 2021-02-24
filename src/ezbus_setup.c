@@ -29,6 +29,8 @@ extern void ezbus_callback_setup( ezbus_udp_cmdline_t* ezbus_udp_cmdline, ezbus_
 
     ezbus_platform_port_set_name(port,NULL);
     ezbus_platform_port_set_handle(port,0);
+
+    port->platform_port.udp_cmdline = ezbus_udp_cmdline;
 }
 
 extern bool ezbus_platform_set_tx( ezbus_platform_port_t* port, bool enable )

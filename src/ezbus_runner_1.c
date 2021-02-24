@@ -42,13 +42,8 @@ static feature_state_t feature_state;
 extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
 {
     memset( &feature_state, 0, sizeof(feature_state_t) );
-    
-    memcpy(&feature_state.port.platform_port.udp_cmdline,ezbus_udp_cmdline,sizeof(ezbus_udp_cmdline_t));
-
     feature_state.timer_start = ezbus_platform_get_ms_ticks();
-
     syslog_init( &feature_state.syslog, stderr, syslog_fputc );
-
     ezbus_callback_setup( ezbus_udp_cmdline, &feature_state.port );
 
     if ( ezbus_port_open( &feature_state.port, EZBUS_SPEED_DEF ) == EZBUS_ERR_OKAY )
