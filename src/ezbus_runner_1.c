@@ -57,7 +57,7 @@ extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
             ezbus_run(&feature_state.ezbus);
             if ( (ezbus_platform_get_ms_ticks() - feature_state.timer_start) > 125)
             {
-                fputc('*',stderr);
+                //fputc('*',stderr);
                 feature_state.timer_start = ezbus_platform_get_ms_ticks();
             }
         }
