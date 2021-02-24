@@ -93,7 +93,9 @@ ezbus_runner_2.elf: $(OBJS) src/ezbus_runner_2.o
 	$(CC) $^ $(LFLAGS) -o $@
 
 clean:
-		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9] *.map
+		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9].elf *.map
 		(cd $(LIBEZBUS_DIR) && make clean)
 		(cd $(LIBEZBUS_UDP_DIR) && make clean)
+		rm -f 	src/ezbus_runner_1.o	\
+				src/ezbus_runner_2.o
 
