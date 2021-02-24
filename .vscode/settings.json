@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "thread": "cpp",
+        "ezbus_socket.h": "c",
+        "ezbus_runner.h": "c"
+    }
+}
