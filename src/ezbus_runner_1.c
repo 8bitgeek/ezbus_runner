@@ -40,7 +40,7 @@ static feature_state_t feature_state;
 
 
 extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
-{
+{    
     memset( &feature_state, 0, sizeof(feature_state_t) );
     feature_state.timer_start = ezbus_platform_get_ms_ticks();
     syslog_init( &feature_state.syslog, stderr, syslog_fputc );
