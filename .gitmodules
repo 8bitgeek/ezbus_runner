@@ -4,3 +4,9 @@
 [submodule "libezbus_udp"]
 	path = libezbus_udp
 	url = https://github.com/8bitgeek/libezbus_udp.git
+[submodule "ezbus_cmdline"]
+	path = ezbus_cmdline
+	url = https://github.com/8bitgeek/ezbus_cmdline.git
+[submodule "libezbus_cmdline"]
+	path = libezbus_cmdline
+	url = https://github.com/8bitgeek/libezbus_cmdline.git
