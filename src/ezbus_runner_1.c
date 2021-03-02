@@ -21,12 +21,13 @@
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
 #include <ezbus_runner.h>
+#include <ezbus_cmdline.h>
 #include <ezbus.h>
 #include <ezbus_flip.h>
 #include <ezbus_port.h>
-#include <ezbus_setup.h>
 #include <syslog.h>
 #include <syslog_printf.h>
+#include <ezbus_platform.h>
 
 typedef struct main
 {
@@ -39,14 +40,14 @@ typedef struct main
 static feature_state_t feature_state;
 
 
-extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
+extern int ezbus_runner(ezbus_cmdline_t* ezbus_udp_cmdline)
 {    
     memset( &feature_state, 0, sizeof(feature_state_t) );
-    feature_state.timer_start = ezbus_platform_get_ms_ticks();
+    feature_state.timer_start = ezbus_platform.callback_get_ms_ticks();
     syslog_init( &feature_state.syslog, stderr, syslog_fputc );
     ezbus_callback_setup( ezbus_udp_cmdline, &feature_state.port );
 
-    if ( ezbus_port_open( &feature_state.port, EZBUS_SPEED_DEF ) == EZBUS_ERR_OKAY )
+    if ( ezbus_port_open( &feature_state.port ) == EZBUS_ERR_OKAY )
     {
         SYSLOG_PRINTF( &feature_state.syslog, SYSLOG_DEBUG, "ezbus init" );
         ezbus_init( &feature_state.ezbus, &feature_state.port );
@@ -55,10 +56,10 @@ extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
         for(;;) /* forever... */
         {
             ezbus_run(&feature_state.ezbus);
-            if ( (ezbus_platform_get_ms_ticks() - feature_state.timer_start) > 125)
+            if ( (ezbus_platform.callback_get_ms_ticks() - feature_state.timer_start) > 125)
             {
                 //fputc('*',stderr);
-                feature_state.timer_start = ezbus_platform_get_ms_ticks();
+                feature_state.timer_start = ezbus_platform.callback_get_ms_ticks();
             }
         }
     }

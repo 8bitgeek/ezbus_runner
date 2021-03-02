@@ -20,15 +20,19 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus_cmdline.h>
 #include <ezbus_runner.h>
 
-ezbus_udp_cmdline_t cmdline;
+ezbus_cmdline_t cmdline;
 
 int main(int argc,char* argv[])
 {
-    if ( ezbus_udp_cmdline_setup(&cmdline,argc,argv) >= 0 )
+    if ( ezbus_cmdline_setup( &cmdline, argc, argv ) >= 0 )
     {
-        return ezbus_runner(&cmdline);
+        if ( ezbus_platform_setup( &cmdline ) >= 0 )
+        {
+            return ezbus_runner( &cmdline );
+        }
     }
     return -1;
 }

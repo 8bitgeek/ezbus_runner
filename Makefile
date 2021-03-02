@@ -31,8 +31,12 @@ LIBEZBUS_INCLUDE += -I $(LIBEZBUS_DIR)/src/socket
 LIBEZBUS_TARGET=$(LIBEZBUS_DIR)/libezbus.a
 
 LIBEZBUS_UDP_DIR=./libezbus_udp
-LIBEZBUS_UDP_INCLUDE += -I $(LIBEZBUS_UDP_DIR)/src
+LIBEZBUS_UDP_INCLUDE += -I $(LIBEZBUS_UDP_DIR)/src 
 LIBEZBUS_UDP_TARGET=libezbus_udp/libezbus_udp.a
+
+LIBEZBUS_CMDLINE_DIR=./libezbus_cmdline
+LIBEZBUS_CMDLINE_INCLUDE += -I $(LIBEZBUS_CMDLINE_DIR)/src -I $(LIBEZBUS_CMDLINE_DIR)/src/platform
+LIBEZBUS_CMDLINE_TARGET=libezbus_cmdline/libezbus_cmdline.a
 
 PREFIX=/usr/bin/
 
@@ -47,19 +51,22 @@ SE=$(PREFIX)size
 ARFLAGS = rcs
 CFLAGS += -c
 CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
-LFLAGS += $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET)
+LFLAGS += $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET) $(LIBEZBUS_CMDLINE_TARGET)
 
 INCLUDE =  -I ./
 INCLUDE += -I ./src
 INCLUDE += -I ./src/syslog
 INCLUDE += $(LIBEZBUS_INCLUDE)
 INCLUDE += $(LIBEZBUS_UDP_INCLUDE)
+INCLUDE += $(LIBEZBUS_CMDLINE_INCLUDE)
 
 C_SRC += src/syslog/syslog_ezbus.c
 C_SRC += src/syslog/syslog_printf.c
 C_SRC += src/syslog/syslog_timestamp.c
 C_SRC += src/syslog/syslog.c
-C_SRC += src/ezbus_setup.c
+C_SRC += src/ezbus_port_unix.c 
+C_SRC += src/ezbus_platform_unix.c
+C_SRC += src/ezbus_cmdline_unix.c
 C_SRC += src/main.c
 
 # Object files to build.
@@ -68,7 +75,7 @@ OBJS += $(C_SRC:.c=.o)
 
 # Default rule to build the whole project.
 .PHONY: all
-all: $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET) $(TARGETS)
+all: $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET) $(LIBEZBUS_CMDLINE_TARGET) $(TARGETS)
 
 # Rule to build assembly files.
 %.o: %.S
@@ -85,6 +92,9 @@ $(LIBEZBUS_TARGET):
 $(LIBEZBUS_UDP_TARGET):
 	(cd $(LIBEZBUS_UDP_DIR) && make)
 
+$(LIBEZBUS_CMDLINE_TARGET):
+	(cd $(LIBEZBUS_CMDLINE_DIR) && make)
+
 # Rule to create an ELF file from the compiled object files.
 ezbus_runner_1.elf: $(OBJS) src/ezbus_runner_1.o
 	$(CC) $^ $(LFLAGS) -o $@
@@ -96,6 +106,7 @@ clean:
 		rm -f $(OBJS) $(TARGET) ezbus_runner_[0-9].elf *.map
 		(cd $(LIBEZBUS_DIR) && make clean)
 		(cd $(LIBEZBUS_UDP_DIR) && make clean)
+		(cd $(LIBEZBUS_CMDLINE_DIR) && make clean)
 		rm -f 	src/ezbus_runner_1.o	\
 				src/ezbus_runner_2.o
 
