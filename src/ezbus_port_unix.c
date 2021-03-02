@@ -47,18 +47,18 @@ typedef struct
     ezbus_udp_listen_t      udp_listen;
 } ezbus_platform_port_t;
 
-static int      ezbus_platform_open         ( ezbus_port_t* port );
-static int      ezbus_platform_send         ( ezbus_port_t* port, void* bytes, size_t size );
-static int      ezbus_platform_recv         ( ezbus_port_t* port, void* bytes, size_t size );
-static void     ezbus_platform_close        ( ezbus_port_t* port );
-static void     ezbus_platform_flush        ( ezbus_port_t* port );
-static void     ezbus_platform_drain        ( ezbus_port_t* port );
-static int      ezbus_platform_getch        ( ezbus_port_t* port );
-static int      ezbus_platform_set_speed    ( ezbus_port_t* port, uint32_t speed );
-static uint32_t ezbus_platform_get_speed    ( ezbus_port_t* port );
-static void     ezbus_platform_set_address  ( ezbus_port_t* port, const ezbus_address_t* address );
-static void     ezbus_platform_get_address  ( ezbus_port_t* port, ezbus_address_t* address );
-static bool     ezbus_platform_set_tx       ( ezbus_port_t* port, bool enable );
+static int                      ezbus_platform_open         ( ezbus_port_t* port );
+static int                      ezbus_platform_send         ( ezbus_port_t* port, void* bytes, size_t size );
+static int                      ezbus_platform_recv         ( ezbus_port_t* port, void* bytes, size_t size );
+static void                     ezbus_platform_close        ( ezbus_port_t* port );
+static void                     ezbus_platform_flush        ( ezbus_port_t* port );
+static void                     ezbus_platform_drain        ( ezbus_port_t* port );
+static int                      ezbus_platform_getch        ( ezbus_port_t* port );
+static int                      ezbus_platform_set_speed    ( ezbus_port_t* port, uint32_t speed );
+static uint32_t                 ezbus_platform_get_speed    ( ezbus_port_t* port );
+static void                     ezbus_platform_set_address  ( ezbus_port_t* port, const ezbus_address_t* address );
+static const ezbus_address_t*   ezbus_platform_get_address  ( ezbus_port_t* port );
+static bool                     ezbus_platform_set_tx       ( ezbus_port_t* port, bool enable );
 
 static void                     serial_set_blocking             (int fd, int should_block);
 static ezbus_platform_port_t*   ezbus_platform_port_get_private (ezbus_port_t* ezbus_port);
@@ -85,7 +85,7 @@ extern int ezbus_port_setup(ezbus_port_t* port)
     port->callback_get_address  = ezbus_platform_get_address;
     port->callback_set_tx       = ezbus_platform_set_tx;
 
-    ezbus_platform_get_address(port,&port->self_address);
+    ezbus_platform_get_address(port);
 
     return 0;
 }
@@ -293,7 +293,7 @@ static void ezbus_platform_set_address ( ezbus_port_t* port, const ezbus_address
     ezbus_address_copy(&port->self_address,address);
 }
 
-static void ezbus_platform_get_address( ezbus_port_t* port, ezbus_address_t* address )
+static const ezbus_address_t* ezbus_platform_get_address( ezbus_port_t* port )
 {
     if ( port->self_address.word == 0 )
     {
@@ -303,7 +303,7 @@ static void ezbus_platform_get_address( ezbus_port_t* port, ezbus_address_t* add
         words[2] = ezbus_platform.callback_rand();
         port->self_address.word = ezbus_crc32(words,3*sizeof(uint32_t));
     }
-    ezbus_address_copy(address,&port->self_address);
+    return &port->self_address;
 }
 
 static void ezbus_platform_flush(ezbus_port_t* port)
