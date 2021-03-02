@@ -43,8 +43,24 @@ int main(int argc,char* argv[])
                     ezbus_init( &ezbus, &port );
                     return ezbus_runner( &ezbus );
                 }
+                else
+                {
+                    fprintf( stderr, "ezbus_port_open failed." );
+                }
+            }
+            else
+            {
+                fprintf( stderr, "ezbus_port_setup failed." );
             }
         }
+        else
+        {
+            fprintf( stderr, "ezbus_platform_setup failed." );
+        }
+    }
+    else
+    {
+        fprintf( stderr, "ezbus_cmdline_setup failed." );
     }
     return -1;
 }

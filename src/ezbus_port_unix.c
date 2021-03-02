@@ -102,7 +102,7 @@ extern void ezbus_port_dispose(ezbus_port_t* port)
 static int ezbus_platform_open(ezbus_port_t* port)
 {
     ezbus_platform_port_t* private_port = ezbus_platform_port_get_private(port);
-    ezbus_cmdline_t* cmdline = ezbus_platform_get_cmdline(&ezbus_platform);
+    ezbus_cmdline_t* cmdline = ezbus_platform_get_cmdline();
     
     if ( ezbus_platform_port_is_udp() )
     {
@@ -284,7 +284,7 @@ static int ezbus_platform_set_speed(ezbus_port_t* port,uint32_t baud)
 
 static uint32_t ezbus_platform_get_speed( ezbus_port_t* port )
 {
-    ezbus_cmdline_t* cmdline = ezbus_platform_get_cmdline(&ezbus_platform);
+    ezbus_cmdline_t* cmdline = ezbus_platform_get_cmdline();
     return ezbus_cmdline_unix_get_serial_baud(cmdline);
 }
 
