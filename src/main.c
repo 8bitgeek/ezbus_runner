@@ -20,15 +20,47 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus.h>
+#include <ezbus_cmdline.h>
+#include <ezbus_platform.h>
+#include <ezbus_port.h>
 #include <ezbus_runner.h>
 
-ezbus_udp_cmdline_t cmdline;
+ezbus_cmdline_t cmdline;
+ezbus_port_t    port;
+ezbus_t         ezbus;
 
 int main(int argc,char* argv[])
 {
-    if ( ezbus_udp_cmdline_setup(&cmdline,argc,argv) >= 0 )
+    if ( ezbus_cmdline_setup( &cmdline, argc, argv ) >= 0 )
     {
-        return ezbus_runner(&cmdline);
+        if ( ezbus_platform_setup( &cmdline ) >= 0 )
+        {
+            if ( ezbus_port_setup(&port) == 0 )
+            {
+                if ( ezbus_port_open( &port ) == EZBUS_ERR_OKAY )
+                {
+                    ezbus_init( &ezbus, &port );
+                    return ezbus_runner( &ezbus );
+                }
+                else
+                {
+                    fprintf( stderr, "ezbus_port_open failed." );
+                }
+            }
+            else
+            {
+                fprintf( stderr, "ezbus_port_setup failed." );
+            }
+        }
+        else
+        {
+            fprintf( stderr, "ezbus_platform_setup failed." );
+        }
+    }
+    else
+    {
+        fprintf( stderr, "ezbus_cmdline_setup failed." );
     }
     return -1;
 }

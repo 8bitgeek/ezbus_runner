@@ -6,6 +6,16 @@
         "ezbus_udp_listen.h": "c",
         "ezbus_udp_cmdline.h": "c",
         "ezbus_udp.h": "c",
-        "fcntl.h": "c"
+        "fcntl.h": "c",
+        "ezbus_platform.h": "c",
+        "ezbus_types.h": "c",
+        "ezbus_packet.h": "c",
+        "ezbus_fault.h": "c",
+        "ezbus_cmdline.h": "c",
+        "ezbus_const.h": "c",
+        "ezbus_cmdline_unix.h": "c",
+        "ezbus_mac_pause.h": "c",
+        "ezbus_socket_common.h": "c",
+        "ezbus_port.h": "c"
     }
 }
