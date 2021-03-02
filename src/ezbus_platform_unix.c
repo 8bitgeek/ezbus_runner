@@ -92,6 +92,8 @@ extern int ezbus_platform_setup(void* cmdline_obj)
     ezbus_platform.callback_delay        = ezbus_platform_delay;
     ezbus_platform.callback_get_ms_ticks = ezbus_platform_get_ms_ticks;
 
+    ezbus_platform_rand_init();
+
     return 0;
 }
 
