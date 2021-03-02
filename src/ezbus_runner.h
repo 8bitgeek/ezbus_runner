@@ -22,7 +22,7 @@
 #ifndef _EZBUS_RUNNER_H_
 #define _EZBUS_RUNNER_H_
 
-#include <ezbus_cmdline.h>
+#include <ezbus.h>
 #include <ezbus_udp_broadcast.h>
 #include <ezbus_udp_listen.h>
 
@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-extern int ezbus_runner(ezbus_cmdline_t* cmdline);
+extern int ezbus_runner(ezbus_t* ezbus);
 
 #ifdef __cplusplus
 }

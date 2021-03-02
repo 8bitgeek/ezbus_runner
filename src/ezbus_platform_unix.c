@@ -21,12 +21,8 @@
 *****************************************************************************/
 #include <ezbus_platform.h>
 #include <ezbus_address.h>
-#include <ezbus_crc32.h>
-#include <linux/serial.h>
-#include <sys/ioctl.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h> 
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -34,9 +30,7 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <time.h>
-#include <sys/select.h>
 #include <sys/time.h>
-#include <asm/termbits.h>
 #include <ezbus_hex.h>
 #include <ezbus_cmdline.h>
 #include <ezbus_cmdline_unix.h>
@@ -97,6 +91,8 @@ extern int ezbus_platform_setup(void* cmdline_obj)
     ezbus_platform.callback_rand_init    = ezbus_platform_rand_init;
     ezbus_platform.callback_delay        = ezbus_platform_delay;
     ezbus_platform.callback_get_ms_ticks = ezbus_platform_get_ms_ticks;
+
+    return 0;
 }
 
 void* ezbus_platform_memset(void* dest, int c, size_t n)

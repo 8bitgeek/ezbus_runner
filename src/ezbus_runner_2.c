@@ -22,17 +22,33 @@
 *****************************************************************************/
 #include <ezbus_runner.h>
 #include <ezbus.h>
-#include <ezbus_flip.h>
 #include <ezbus_port.h>
-#include <ezbus_setup.h>
-#include <syslog.h>
-#include <syslog_printf.h>
+#include <ezbus_platform.h>
 
-extern int ezbus_runner(ezbus_udp_cmdline_t* ezbus_udp_cmdline)
+typedef struct main
 {
+    ezbus_t* ezbus;
+    ezbus_ms_tick_t timer_start;
+} feature_state_t;
+
+static feature_state_t feature_state;
+
+
+extern int ezbus_runner(ezbus_t* ezbus)
+{    
+    memset( &feature_state, 0, sizeof(feature_state_t) );
+
+    feature_state.ezbus = ezbus;
+    feature_state.timer_start = ezbus_platform.callback_get_ms_ticks();
+    
+    fprintf( stderr, "self %s", ezbus_address_string(&ezbus_port(ezbus)->self_address) );
+
+    for(;;)
+    {
+        ezbus_run(feature_state.ezbus);
+    }
     return -1;
 }
-
 
 extern bool ezbus_socket_callback_send ( ezbus_socket_t socket )
 {

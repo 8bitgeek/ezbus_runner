@@ -20,10 +20,15 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
+#include <ezbus.h>
 #include <ezbus_cmdline.h>
+#include <ezbus_platform.h>
+#include <ezbus_port.h>
 #include <ezbus_runner.h>
 
 ezbus_cmdline_t cmdline;
+ezbus_port_t    port;
+ezbus_t         ezbus;
 
 int main(int argc,char* argv[])
 {
@@ -31,7 +36,14 @@ int main(int argc,char* argv[])
     {
         if ( ezbus_platform_setup( &cmdline ) >= 0 )
         {
-            return ezbus_runner( &cmdline );
+            if ( ezbus_port_setup(&port) == 0 )
+            {
+                if ( ezbus_port_open( &port ) == EZBUS_ERR_OKAY )
+                {
+                    ezbus_init( &ezbus, &port );
+                    return ezbus_runner( &ezbus );
+                }
+            }
         }
     }
     return -1;

@@ -37,6 +37,7 @@
 #include <ezbus_udp_listen.h>
 #include <ezbus_cmdline_unix.h>
 #include <ezbus_platform.h>
+#include <ezbus_crc32.h>
 
 typedef struct
 {
@@ -297,9 +298,9 @@ static void ezbus_platform_get_address( ezbus_port_t* port, ezbus_address_t* add
     if ( port->self_address.word == 0 )
     {
         uint32_t words[3];
-        words[0] = ezbus_platform_rand();
-        words[1] = ezbus_platform_rand();
-        words[2] = ezbus_platform_rand();
+        words[0] = ezbus_platform.callback_rand();
+        words[1] = ezbus_platform.callback_rand();
+        words[2] = ezbus_platform.callback_rand();
         port->self_address.word = ezbus_crc32(words,3*sizeof(uint32_t));
     }
     ezbus_address_copy(address,&port->self_address);
