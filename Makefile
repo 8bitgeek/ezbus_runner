@@ -50,7 +50,9 @@ SE=$(PREFIX)size
 
 ARFLAGS = rcs
 CFLAGS += -c
-CFLAGS += -std=gnu99 -ggdb -O0 -Wall -Wno-unused-function
+#CFLAGS += -ggdb -O0 
+CFLAGS += -O2
+CFLAGS += -std=gnu99 -Wall -Wno-unused-function
 LFLAGS += $(LIBEZBUS_TARGET) $(LIBEZBUS_UDP_TARGET) $(LIBEZBUS_CMDLINE_TARGET)
 
 INCLUDE =  -I ./
