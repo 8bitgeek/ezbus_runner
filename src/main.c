@@ -25,13 +25,17 @@
 #include <ezbus_platform.h>
 #include <ezbus_port.h>
 #include <ezbus_runner.h>
+#include <syslog_printf.h>
 
 ezbus_cmdline_t cmdline;
 ezbus_port_t    port;
 ezbus_t         ezbus;
+syslog_t        syslog;
 
 int main(int argc,char* argv[])
 {
+    syslog_init( &syslog, stderr, syslog_fputc );
+
     if ( ezbus_cmdline_setup( &cmdline, argc, argv ) >= 0 )
     {
         if ( ezbus_platform_setup( &cmdline ) >= 0 )
