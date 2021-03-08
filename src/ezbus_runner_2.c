@@ -41,7 +41,7 @@ extern int ezbus_runner(ezbus_t* ezbus)
     feature_state.ezbus = ezbus;
     feature_state.timer_start = ezbus_platform.callback_get_ms_ticks();
     
-    fprintf( stderr, "self %s", ezbus_address_string(ezbus_port_get_address(ezbus_port(ezbus) ) ) );
+    fprintf( stderr, "self %s\n", ezbus_address_string(ezbus_port_get_address(ezbus_port(ezbus) ) ) );
 
     for(;;)
     {

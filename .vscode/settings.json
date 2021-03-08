@@ -16,6 +16,10 @@
         "ezbus_cmdline_unix.h": "c",
         "ezbus_mac_pause.h": "c",
         "ezbus_socket_common.h": "c",
-        "ezbus_port.h": "c"
+        "ezbus_port.h": "c",
+        "ezbus_mac_struct.h": "c",
+        "syslog.h": "c",
+        "ezbus_mac_arbiter_transmit.h": "c",
+        "ezbus_socket_callback.h": "c"
     }
 }
