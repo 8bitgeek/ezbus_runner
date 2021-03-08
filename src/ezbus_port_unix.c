@@ -204,7 +204,7 @@ static int ezbus_platform_getch(ezbus_port_t* port)
         int rc = ezbus_udp_listen_recv(&private_port->udp_listen,&ch,1);
         if ( rc == 1 )
         {
-            #if 1
+            #if EZBUS_LOG_RX_BYTES
                 if ( ch == 0x55 )
                     fputc('\n',stderr);
                 fprintf( stderr, "%02X ", ch );
