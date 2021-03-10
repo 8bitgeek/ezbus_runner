@@ -25,6 +25,8 @@
 #include <ezbus_port.h>
 #include <ezbus_platform.h>
 
+#define TOKEN_PERIOD    10000
+
 typedef struct main
 {
     ezbus_t* ezbus;
@@ -42,6 +44,8 @@ extern int ezbus_runner(ezbus_t* ezbus)
     feature_state.timer_start = ezbus_platform.callback_get_ms_ticks();
     
     fprintf( stderr, "self %s\n", ezbus_address_string(ezbus_port_get_address(ezbus_port(ezbus) ) ) );
+
+    ezbus_mac_arbiter_set_token_period( ezbus_mac(feature_state.ezbus), TOKEN_PERIOD );
 
     for(;;)
     {
