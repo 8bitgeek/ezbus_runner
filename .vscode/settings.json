@@ -20,6 +20,10 @@
         "ezbus_mac_struct.h": "c",
         "syslog.h": "c",
         "ezbus_mac_arbiter_transmit.h": "c",
-        "ezbus_socket_callback.h": "c"
+        "ezbus_socket_callback.h": "c",
+        "string.h": "c",
+        "ezbus_hex.h": "c",
+        "stdbool.h": "c",
+        "errno.h": "c"
     }
 }

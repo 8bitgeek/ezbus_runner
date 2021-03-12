@@ -19,7 +19,7 @@
 * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        *
 * DEALINGS IN THE SOFTWARE.                                                  *
 *****************************************************************************/
-#include <ezbus_platform_caribou.h>
+#include <ezbus_platform.h>
 #include <ezbus_address.h>
 #include <caribou/lib/stdio.h>
 #include <caribou/dev/uart.h>
@@ -30,109 +30,63 @@
     #include <ezbus_callback.h>
 #endif
 
-static uint32_t _platform_address = 0;
+ezbus_platform_t ezbus_platform;
 
-int ezbus_platform_open(ezbus_platform_port_t* port,uint32_t speed)
+static void*    ezbus_platform_memset      ( void* dest, int c, size_t n );
+static void*    ezbus_platform_memcpy      ( void* dest, const void *src, size_t n );
+static void*    ezbus_platform_memmove     ( void* dest, const void *src, size_t n );
+static int      ezbus_platform_memcmp      ( const void* dest, const void *src, size_t n );
+static char*    ezbus_platform_strcpy      ( char* dest, const char *src );
+static char*    ezbus_platform_strcat      ( char* dest, const char *src );
+static char*    ezbus_platform_strncpy     ( char* dest, const char *src, size_t n );
+static int      ezbus_platform_strcmp      ( const char* s1, const char *s2 );
+static int      ezbus_platform_strcasecmp  ( const char* s1, const char *s2 );
+static size_t   ezbus_platform_strlen      ( const char* s);
+static void*    ezbus_platform_malloc      ( size_t n );
+static void*    ezbus_platform_realloc     ( void* src, size_t n );
+static void     ezbus_platform_free        ( void *src );
+
+static int      ezbus_platform_rand        ( void );
+static void     ezbus_platform_srand       ( unsigned int seed );
+static int      ezbus_platform_random      ( int lower, int upper );
+static void     ezbus_platform_rand_init   ( void );
+static void     ezbus_platform_delay       ( unsigned int ms );
+static void     ezbus_platform_set_address ( const ezbus_address_t* address );
+static void     ezbus_platform_address     ( ezbus_address_t* address );
+
+static ezbus_ms_tick_t  ezbus_platform_get_ms_ticks();
+
+extern int ezbus_platform_setup(void* cmdline_obj)
 {
-    if (( port->fd = fopen(port->serial_port_no,"rw"))!=NULL)
-    {
-        ezbus_platform_set_speed(port,speed);
-        return 0;
-    }
-    return -1;
-}
+    ezbus_cmdline_t* cmdline = (ezbus_cmdline_t*)cmdline_obj;
 
-#if defined(EZBUS_USE_FLOW_CALLBACK) && defined(EZBUS_USE_DEFAULT_FLOW_CALLBACK)
-    // define this function for your platform
-    extern bool ezbus_platform_set_tx( ezbus_platform_port_t* port, bool enable )
-    {
-        if ( enable )
-        {
-            caribou_gpio_set(ezbus_platform_port_get_dir_gpio_rx(port));
-            caribou_gpio_set(ezbus_platform_port_get_dir_gpio_tx(port));
-        }
-        else
-        {
-            caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_rx(port));
-            caribou_gpio_reset(ezbus_platform_port_get_dir_gpio_tx(port));
-        }
-        return enable;
-    }
-#endif
+    memset(&ezbus_platform,0,sizeof(ezbus_platform_t));
 
-#if !defined(PRIVATE_EZBUS_PLATFORM_SEND)
-int ezbus_platform_send(ezbus_platform_port_t* port,void* bytes,size_t size)
-{
-    uint8_t* p = (uint8_t*)bytes;
-    size_t sent=0;
-    #if defined(EZBUS_USE_FLOW_CALLBACK)
-        ezbus_platform_set_tx( port, true );
-    #endif
-    do {
-        sent += fwrite(p,1,size-sent,port->fd);
-        p = (uint8_t*)bytes;
-        p = &p[sent];
-    } while (sent<size);
-    ezbus_platform_flush( port );
-    #if defined(EZBUS_USE_FLOW_CALLBACK)
-        ezbus_platform_set_tx( port, false );
-    #endif
-    return sent;
-}
-#endif
+    ezbus_platform.cmdline = cmdline;
 
-int ezbus_platform_recv(ezbus_platform_port_t* port,void* bytes,size_t size)
-{
-    int rc = fread(bytes,1,size,port->fd);
-    return rc;
-}
+    ezbus_platform.callback_memset       = ezbus_platform_memset;
+    ezbus_platform.callback_memcpy       = ezbus_platform_memcpy;
+    ezbus_platform.callback_memmove      = ezbus_platform_memmove;
+    ezbus_platform.callback_memcmp       = ezbus_platform_memcmp;
+    ezbus_platform.callback_strcpy       = ezbus_platform_strcpy;
+    ezbus_platform.callback_strcat       = ezbus_platform_strcat;
+    ezbus_platform.callback_strncpy      = ezbus_platform_strncpy;
+    ezbus_platform.callback_strcmp       = ezbus_platform_strcmp;
+    ezbus_platform.callback_strcasecmp   = ezbus_platform_strcasecmp;
+    ezbus_platform.callback_strlen       = ezbus_platform_strlen;
+    ezbus_platform.callback_malloc       = ezbus_platform_malloc;
+    ezbus_platform.callback_realloc      = ezbus_platform_realloc;
+    ezbus_platform.callback_free         = ezbus_platform_free;
+    ezbus_platform.callback_rand         = ezbus_platform_rand;
+    ezbus_platform.callback_srand        = ezbus_platform_srand;
+    ezbus_platform.callback_random       = ezbus_platform_random;
+    ezbus_platform.callback_rand_init    = ezbus_platform_rand_init;
+    ezbus_platform.callback_delay        = ezbus_platform_delay;
+    ezbus_platform.callback_get_ms_ticks = ezbus_platform_get_ms_ticks;
 
-void ezbus_platform_close(ezbus_platform_port_t* port)
-{
-    fclose(port->fd);
-}
+    ezbus_platform_rand_init();
 
-void ezbus_platform_drain(ezbus_platform_port_t* port)
-{
-    while(ezbus_platform_getc(port)>=0);
-}
-
-int ezbus_platform_set_speed(ezbus_platform_port_t* port,uint32_t speed)
-{
-    caribou_uart_config_t config;
-    caribou_uart_init_config(&config);
-    config.baud_rate = speed;
-    
-    #if defined(EZBUS_USE_DMA)
-        #define EZBUS_USE_RX_DMA 1
-        #define EZBUS_USE_TX_DMA 1
-    #endif
-
-    #if defined(EZBUS_USE_RX_DMA)
-        config.dma_mode |= CARIBOU_UART_DMA_RX;
-    #endif
-    
-    #if defined(EZBUS_USE_TX_DMA)
-        config.dma_mode |= CARIBOU_UART_DMA_TX;
-    #endif
-    
-    #if defined( EZBUS_USE_RX_DMA ) || defined( EZBUS_USE_TX_DMA )
-        config.dma_prio = CARIBOU_UART_DMA_PRIO_MEDIUM;
-    #endif 
-
-    #if !defined(EZBUS_USE_FLOW_CALLBACK)
-        config.flow_control = CARIBOU_UART_FLOW_RS485_GPIO;
-        config.gpio = port->dir_tx_pin;
-    #endif
-    
-    caribou_uart_set_config(port->serial_port_no,&config);
-    
     return 0;
-}
-
-void ezbus_platform_flush(ezbus_platform_port_t* port)
-{
-    fflush(port->fd);
 }
 
 void* ezbus_platform_memset(void* dest, int c, size_t n)
@@ -170,11 +124,10 @@ char* ezbus_platform_strncpy( char* dest, const char *src, size_t n )
     return strncpy( dest, src, n );
 }
 
-size_t ezbus_platform_strlen ( const char* s)
+size_t ezbus_platform_strlen( const char* s)
 {
     return strlen( s );
 }
-
 
 extern int ezbus_platform_strcmp( const char* s1, const char *s2 )
 {
@@ -203,7 +156,11 @@ void ezbus_platform_free(void *src)
 
 ezbus_ms_tick_t ezbus_platform_get_ms_ticks()
 {
-    return caribou_timer_ticks();
+    ezbus_ms_tick_t ticks;
+    struct timeval tm;
+    gettimeofday(&tm,NULL);
+    ticks = ((tm.tv_sec*1000)+(tm.tv_usec/1000));
+    return ticks;
 }
 
 int ezbus_platform_rand(void)
@@ -222,7 +179,7 @@ int ezbus_platform_random(int lower, int upper)
     return num;
 }
 
-void  ezbus_platform_rand_init (void)
+void ezbus_platform_rand_init (void)
 {
     ezbus_platform_srand( ezbus_platform_get_ms_ticks()&0xFFFFFFFF );
 }
@@ -230,34 +187,5 @@ void  ezbus_platform_rand_init (void)
 void ezbus_platform_delay(unsigned int ms)
 {
     ezbus_ms_tick_t start = ezbus_platform_get_ms_ticks();
-    while ( (ezbus_platform_get_ms_ticks() - start) < ms )
-    {
-        caribou_thread_yield();
-    }
+    while ( (ezbus_platform_get_ms_ticks() - start) < ms );
 }
-
-void ezbus_platform_set_address ( const ezbus_address_t* address )
-{
-    _platform_address = address->word;
-}
-
-void ezbus_platform_address(ezbus_address_t* address)
-{
-    if ( _platform_address == 0 )
-    {
-        uint32_t words[3];
-        caribou_get_uuid(words);
-        _platform_address = ezbus_crc32(words,3*sizeof(uint32_t));
-    }
-    address->word = _platform_address;
-}
-
-void ezbus_platform_port_dump( ezbus_platform_port_t* platform_port, const char* prefix )
-{
-    fprintf(stderr, "%s.serial_port_no=%d\n", prefix, platform_port->serial_port_no );
-    fprintf(stderr, "%s.dir_tx_pin=%08X\n",   prefix, platform_port->dir_tx_pin );
-    fprintf(stderr, "%s.ndir_rx_pin=%08X\n",  prefix, platform_port->ndir_rx_pin );
-    fprintf(stderr, "%s.fd=%08X\n",           prefix, platform_port->fd );
-    fflush(stderr);
-}
-
